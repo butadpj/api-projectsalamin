@@ -1,7 +1,9 @@
-import 'dotenv/config'
 import { serve } from '@hono/node-server'
+import dotenv from 'dotenv'
 import { createApp } from './app.js'
 import { createDatabase } from './db/client.js'
+
+if (!process.env.POSTGRES_URL) dotenv.config({ path: '.env.local' })
 
 const postgresUrl = process.env.POSTGRES_URL
 if (!postgresUrl) throw new Error('POSTGRES_URL is required.')
