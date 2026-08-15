@@ -1,8 +1,10 @@
+import dotenv from 'dotenv'
 import { Hono } from 'hono'
 import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
+import { handle } from 'hono/vercel'
 import { SubmitResponseRequestSchema } from './response-contract.js'
-import type { SalaminDatabase } from './db/client.js'
+import { createDatabase, type SalaminDatabase } from './db/client.js'
 import { responseStore } from './responses/store.js'
 
 export function createApp(db: SalaminDatabase, allowedOrigins: string[]) {
@@ -49,3 +51,18 @@ export function createApp(db: SalaminDatabase, allowedOrigins: string[]) {
 
   return app
 }
+
+if (!process.env.POSTGRES_URL) dotenv.config({ path: '.env.local' })
+
+const postgresUrl = process.env.POSTGRES_URL
+if (!postgresUrl) throw new Error('POSTGRES_URL is required.')
+
+const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
+const { db } = createDatabase(postgresUrl)
+
+export const app = createApp(db, allowedOrigins)
+export default handle(app)

@@ -31,3 +31,7 @@ pnpm dev
 - `POST /api/responses`
 
 Only consented responses should be sent. The client-generated `submissionId` makes retries idempotent.
+
+## Vercel
+
+The repository includes `api/index.ts` and `vercel.json`. In Vercel, use the repository root, leave the Output Directory empty, and configure `POSTGRES_URL` and `ALLOWED_ORIGINS` as production environment variables. Vercel bundles the Hono handler; `dist` is not the deployment output directory.
